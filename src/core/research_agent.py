@@ -1,6 +1,6 @@
-from models import ResearchResponse
-from llm_config import create_openai_llm, create_parser, create_prompt
-from agent_config import get_tools, create_agent, create_agent_executor
+from core.agent_config import get_tools, create_agent, create_agent_executor
+from core.llm_config import create_openai_llm, create_parser, create_prompt
+from models.research_response import ResearchResponse
 
 class ResearchAgent:
     def __init__(self, model: str = "gpt-4o"):

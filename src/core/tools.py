@@ -1,8 +1,8 @@
+from datetime import datetime
+from ddgs import DDGS
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain.tools import Tool
-from datetime import datetime
-from ddgs import DDGS
 
 def save_to_txt(data: str, filename: str="research_response.txt"):
     timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")

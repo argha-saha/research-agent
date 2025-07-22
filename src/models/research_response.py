@@ -2,6 +2,6 @@ from pydantic import BaseModel
 
 class ResearchResponse(BaseModel):
     topic: str
-    summary: str
+    result: str
     sources: list[str]
-    tools_used: list[str] 
+    tools_used: list[str]
