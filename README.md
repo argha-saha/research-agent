@@ -1,6 +1,6 @@
 # AI Research Agent
 
-A research assistant that uses AI models to perform comprehensive research on any topic. The agent leverages multiple tools including web search, Wikipedia, and can save research results to files.
+A research assistant that uses AI models to perform comprehensive research on any topic. The agent leverages multiple tools including web search, Wikipedia, and can save research results to various file formats.
 
 ## Installation
 
@@ -12,7 +12,7 @@ A research assistant that uses AI models to perform comprehensive research on an
 
 2. **Install dependencies**:
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 3. **Set up environment variables**:
@@ -34,8 +34,19 @@ The agent will prompt you to enter a research query, then perform comprehensive 
 
 ### CLI Options
 
-The research agent supports several command-line options to control output verbosity:
+**Output Modes:**
+- **Default (clean)**: Shows only research results and sources
+- **Verbose**: Shows LLM thought process and reasoning
+- **Tools**: Shows which tools were used during research
+- **All**: Shows everything 
 
+**Export Formats:**
+- **TXT**
+- **JSON**
+- **MD**
+- **PDF**
+- **All**
+<br></br>
 ```bash
 # Basic usage
 python src/main.py
@@ -55,15 +66,16 @@ python src/main.py --all
 # or
 python src/main.py -a
 
-# Combine options
-python src/main.py -v -t
-```
+# Export results to specific format
+python src/main.py --export json
+python src/main.py --export markdown
+python src/main.py --export pdf
+python src/main.py --export all
 
-**Output Modes:**
-- **Default (clean)**: Shows only research results and sources
-- **Verbose**: Shows LLM thought process and reasoning
-- **Tools**: Shows which tools were used during research
-- **All**: Shows everything 
+# Combine options
+python src/main.py -v -t --export json
+python src/main.py --all --export all --output-dir my_exports
+```
 
 ### Using Different Models
 
