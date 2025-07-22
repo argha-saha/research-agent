@@ -22,7 +22,7 @@ def load_models_from_json() -> dict:
 
 def get_default_openai_model() -> str:
     models_config = load_models_from_json()
-    return models_config["openai"]["o4-mini"]
+    return models_config["openai"]["o4-mini-deep-research"]
 
 
 def get_default_anthropic_model() -> str:
