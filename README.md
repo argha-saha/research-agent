@@ -32,6 +32,39 @@ python src/main.py
 
 The agent will prompt you to enter a research query, then perform comprehensive research using available tools.
 
+### CLI Options
+
+The research agent supports several command-line options to control output verbosity:
+
+```bash
+# Basic usage
+python src/main.py
+
+# Show detailed LLM thought process
+python src/main.py --verbose
+# or
+python src/main.py -v
+
+# Show tools used during research
+python src/main.py --tools
+# or
+python src/main.py -t
+
+# Show everything
+python src/main.py --all
+# or
+python src/main.py -a
+
+# Combine options
+python src/main.py -v -t
+```
+
+**Output Modes:**
+- **Default (clean)**: Shows only research results and sources
+- **Verbose**: Shows LLM thought process and reasoning
+- **Tools**: Shows which tools were used during research
+- **All**: Shows everything 
+
 ### Using Different Models
 
 You can specify different models when initializing the agent:

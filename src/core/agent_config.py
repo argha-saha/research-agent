@@ -13,5 +13,5 @@ def create_agent(llm, prompt, tools):
     )
 
 
-def create_agent_executor(agent, tools, verbose: bool = True):
+def create_agent_executor(agent, tools, verbose: bool = False):
     return AgentExecutor(agent=agent, tools=tools, verbose=verbose) 
