@@ -2,7 +2,7 @@ import argparse
 from dotenv import load_dotenv
 from core.research_agent import ResearchAgent
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
         description="AI Research Agent",
@@ -38,7 +38,7 @@ Examples:
     return parser.parse_args()
 
 
-def print_status(args):
+def print_status(args) -> None:
     print("AI Research Agent")
     print("-" * 25)
     
@@ -52,7 +52,7 @@ def print_status(args):
     print()
 
 
-def main():
+def main() -> None:
     args = parse_arguments()
     
     if args.all:

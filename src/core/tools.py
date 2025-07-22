@@ -4,7 +4,7 @@ from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain.tools import Tool
 
-def save_to_txt(data: str, filename: str="research_response.txt"):
+def save_to_txt(data: str, filename: str="research_response.txt") -> str:
     timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     formatted_text = f"Research Response -- Timestamp: {timestamp}\n\n{data}"
     
