@@ -3,15 +3,27 @@ from ddgs import DDGS
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from langchain.tools import Tool
+from core.exports import export_research, ResearchExporter
+from models.research_response import ResearchResponse
 
-def save_to_txt(data: str, filename: str="research_response.txt") -> str:
-    timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-    formatted_text = f"Research Response -- Timestamp: {timestamp}\n\n{data}"
-    
-    with open(filename, "a", encoding="utf-8") as file:
-        file.write(formatted_text)
-        
-    return f"Data saved to {filename}"
+
+def save_to_format(data: str, format_type: str = "txt", filename: str = None) -> str:
+    """Save research data to specified format"""
+    try:
+        research_data = ResearchResponse(
+            topic="Research Query",
+            result=data,
+            sources=[],
+            tools_used=[]
+        )
+        return export_research(research_data, format_type)
+    except Exception as e:
+        return f"Export error: {str(e)}"
+
+
+def save_to_txt(data: str, filename: str = "research_response.txt") -> str:
+    """Legacy function for backward compatibility"""
+    return save_to_format(data, "txt", filename)
 
 
 def search_web(query: str) -> str:
@@ -31,6 +43,18 @@ save_tool = Tool(
     name="save_to_txt",
     func=save_to_txt,
     description="Save the data to a text file"
+)
+
+save_json_tool = Tool(
+    name="save_to_json",
+    func=lambda data: save_to_format(data, "json"),
+    description="Save the data to a JSON file"
+)
+
+save_markdown_tool = Tool(
+    name="save_to_markdown",
+    func=lambda data: save_to_format(data, "markdown"),
+    description="Save the data to a Markdown file"
 )
 
 search_tool = Tool(
