@@ -34,3 +34,26 @@ class SessionManager:
             return self.db.get_session_entries(self.current_session_id)
         
         return []
+
+    def add_research_entry(
+        self, query: str, research_response: ResearchResponse
+    ) -> bool:
+        if self.current_session_id:
+            self.db.add_research_entry(
+                self.current_session_id, query, research_response
+            )
+            return True
+        return False
+
+    def list_recent_sessions(self, limit: int = 10) -> List[Dict[str, Any]]:
+        return self.db.list_sessions(limit)
+
+    def delete_session(self, session_id: int) -> bool:
+        success = self.db.delete_session(session_id)
+
+        # If the current session is deleted, clear it
+        if success and self.current_session_id == session_id:
+            self.current_session_id = None
+            self.current_session_data = None
+
+        return success
