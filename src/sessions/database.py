@@ -237,3 +237,29 @@ class ResearchDatabase:
                 })
             
             return sessions
+    
+    def get_recent_entries_across_sessions(self, limit: int = 20) -> List[Dict[str, Any]]:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Uses idx_research_entries_timestamp and gets the most recent entries
+            cursor.execute("""
+                SELECT re.id, re.session_id, re.query, re.result, re.timestamp, s.topic
+                FROM research_entries re
+                JOIN sessions s ON re.session_id = s.id
+                ORDER BY re.timestamp DESC
+                LIMIT ?
+            """, (limit,))
+            
+            entries = []
+            for row in cursor.fetchall():
+                entries.append({
+                    'id': row[0],
+                    'session_id': row[1],
+                    'query': row[2],
+                    'result': row[3],
+                    'timestamp': row[4],
+                    'session_topic': row[5]
+                })
+            
+            return entries
