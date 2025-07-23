@@ -187,3 +187,16 @@ class ResearchDatabase:
                 })
             
             return sessions
+    
+    def delete_session(self, session_id: int) -> bool:
+        """Delete a session and all its research entries"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Delete research entries first
+            cursor.execute("DELETE FROM research_entries WHERE session_id = ?", (session_id,))
+            
+            # Delete session
+            cursor.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+            
+            return cursor.rowcount > 0
