@@ -187,6 +187,17 @@ class ResearchDatabase:
                 })
             
             return sessions
+        
+    def update_session_status(self, session_id: int, status: str) -> bool:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE sessions 
+                SET status = ?, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ?
+            """, (status, session_id))
+            
+            return cursor.rowcount > 0
     
     def delete_session(self, session_id: int) -> bool:
         """Delete a session and all its research entries"""
