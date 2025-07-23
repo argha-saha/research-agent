@@ -25,3 +25,12 @@ class SessionManager:
             return True
 
         return False
+
+    def get_current_session(self) -> Optional[Dict[str, Any]]:
+        return self.current_session_data
+
+    def get_current_session_entries(self) -> List[Dict[str, Any]]:
+        if self.current_session_id:
+            return self.db.get_session_entries(self.current_session_id)
+        
+        return []
