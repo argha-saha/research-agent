@@ -122,7 +122,6 @@ class ResearchDatabase:
     def get_session(self, session_id: int) -> Optional[Dict[str, Any]]:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
-            
             cursor.execute("""
                 SELECT id, topic, model_used, created_at, updated_at, status, metadata
                 FROM sessions WHERE id = ?
@@ -139,5 +138,28 @@ class ResearchDatabase:
                     'status': row[5],
                     'metadata': json.loads(row[6])
                 }
-                
             return None
+    
+    def get_session_entries(self, session_id: int) -> List[Dict[str, Any]]:
+        """Get all research entries for a session"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, query, result, sources, tools_used, timestamp
+                FROM research_entries 
+                WHERE session_id = ?
+                ORDER BY timestamp ASC
+            """, (session_id,))
+            
+            entries = []
+            for row in cursor.fetchall():
+                entries.append({
+                    'id': row[0],
+                    'query': row[1],
+                    'result': row[2],
+                    'sources': json.loads(row[3]),
+                    'tools_used': json.loads(row[4]),
+                    'timestamp': row[5]
+                })
+            
+            return entries
