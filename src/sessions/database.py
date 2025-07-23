@@ -211,3 +211,29 @@ class ResearchDatabase:
             cursor.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
             
             return cursor.rowcount > 0
+    
+    def get_sessions_by_status(self, status: str, limit: int = 10) -> List[Dict[str, Any]]:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Uses idx_sessions_status
+            cursor.execute("""
+                SELECT id, topic, model_used, created_at, updated_at, status
+                FROM sessions 
+                WHERE status = ?
+                ORDER BY updated_at DESC 
+                LIMIT ?
+            """, (status, limit))
+            
+            sessions = []
+            for row in cursor.fetchall():
+                sessions.append({
+                    'id': row[0],
+                    'topic': row[1],
+                    'model_used': row[2],
+                    'created_at': row[3],
+                    'updated_at': row[4],
+                    'status': row[5]
+                })
+            
+            return sessions
