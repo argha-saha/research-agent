@@ -118,3 +118,26 @@ class ResearchDatabase:
             """, (session_id,))
             
             return cursor.lastrowid
+    
+    def get_session(self, session_id: int) -> Optional[Dict[str, Any]]:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT id, topic, model_used, created_at, updated_at, status, metadata
+                FROM sessions WHERE id = ?
+            """, (session_id,))
+            
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'id': row[0],
+                    'topic': row[1],
+                    'model_used': row[2],
+                    'created_at': row[3],
+                    'updated_at': row[4],
+                    'status': row[5],
+                    'metadata': json.loads(row[6])
+                }
+                
+            return None
