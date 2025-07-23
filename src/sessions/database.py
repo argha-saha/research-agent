@@ -163,3 +163,27 @@ class ResearchDatabase:
                 })
             
             return entries
+    
+    def list_sessions(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """List recent sessions"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, topic, model_used, created_at, updated_at, status
+                FROM sessions 
+                ORDER BY updated_at DESC 
+                LIMIT ?
+            """, (limit,))
+            
+            sessions = []
+            for row in cursor.fetchall():
+                sessions.append({
+                    'id': row[0],
+                    'topic': row[1],
+                    'model_used': row[2],
+                    'created_at': row[3],
+                    'updated_at': row[4],
+                    'status': row[5]
+                })
+            
+            return sessions
