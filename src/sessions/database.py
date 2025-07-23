@@ -1,7 +1,8 @@
 import sqlite3
 import json
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
+from typing import List, Optional, Dict, Any
 from models.research_response import ResearchResponse
 
 
@@ -92,5 +93,28 @@ class ResearchDatabase:
                 INSERT INTO sessions (topic, model_used, metadata)
                 VALUES (?, ?, ?)
             """, (topic, model_used, metadata_json))
+            
+            return cursor.lastrowid
+    
+    def add_research_entry(self, session_id: int, query: str, research_response: ResearchResponse) -> int:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO research_entries (session_id, query, result, sources, tools_used)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                session_id,
+                query,
+                research_response.result,
+                json.dumps(research_response.sources),
+                json.dumps(research_response.tools_used)
+            ))
+            
+            cursor.execute("""
+                UPDATE sessions 
+                SET updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ?
+            """, (session_id,))
             
             return cursor.lastrowid
