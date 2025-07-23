@@ -32,7 +32,7 @@ class SessionManager:
     def get_current_session_entries(self) -> List[Dict[str, Any]]:
         if self.current_session_id:
             return self.db.get_session_entries(self.current_session_id)
-        
+
         return []
 
     def add_research_entry(
@@ -64,7 +64,20 @@ class SessionManager:
             if success:
                 self.current_session_id = None
                 self.current_session_data = None
-                
+
             return success
-        
+
         return False
+
+    def is_session_active(self) -> bool:
+        return self.current_session_id is not None
+
+    def get_session_summary(self, session_id: int) -> Optional[Dict[str, Any]]:
+        session_data = self.db.get_session(session_id)
+        if session_data:
+            entries = self.db.get_session_entries(session_id)
+            session_data["entry_count"] = len(entries)
+            session_data["last_query"] = entries[-1]["query"] if entries else None
+            return session_data
+        
+        return None
