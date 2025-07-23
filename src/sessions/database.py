@@ -1,5 +1,7 @@
 import sqlite3
+import json
 from pathlib import Path
+from typing import Dict, Any
 from models.research_response import ResearchResponse
 
 
@@ -80,3 +82,15 @@ class ResearchDatabase:
             """)
             
             conn.commit()
+    
+    def create_session(self, topic: str, model_used: str, metadata: Dict[str, Any] = None) -> int:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            metadata_json = json.dumps(metadata or {})
+            
+            cursor.execute("""
+                INSERT INTO sessions (topic, model_used, metadata)
+                VALUES (?, ?, ?)
+            """, (topic, model_used, metadata_json))
+            
+            return cursor.lastrowid
