@@ -57,3 +57,14 @@ class SessionManager:
             self.current_session_data = None
 
         return success
+
+    def close_current_session(self) -> bool:
+        if self.current_session_id:
+            success = self.db.update_session_status(self.current_session_id, "closed")
+            if success:
+                self.current_session_id = None
+                self.current_session_data = None
+                
+            return success
+        
+        return False
