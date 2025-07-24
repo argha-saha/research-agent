@@ -5,7 +5,6 @@ from models.research_response import ResearchResponse
 
 class ResearchAgent:
     def __init__(self, model: str = "gpt-4o", verbose: bool = False, session_manager: SessionManager = None):
-        """Initialize the research agent with specified model and verbose setting"""
         self.llm = create_openai_llm(model)
         self.parser = create_parser()
         self.prompt = create_prompt(self.parser)

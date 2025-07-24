@@ -2,6 +2,11 @@ import argparse
 from dotenv import load_dotenv
 from core.research_agent import ResearchAgent
 from core.exports import ResearchExporter, export_research
+from sessions.session_manager import SessionManager
+from sessions.session_commands import (
+    handle_list_sessions, handle_load_session, handle_delete_session, 
+    handle_new_session, display_session_details
+)
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments"""
@@ -17,6 +22,13 @@ Examples:
   python src/main.py -v -t              # Short form for verbose and tools
   python src/main.py --export pdf       # Export results to PDF
   python src/main.py --export all       # Export to all formats
+  
+Session Management:
+  python src/main.py --new-session --session-topic "CPU Architecture"
+  python src/main.py --history
+  python src/main.py --load 2
+  python src/main.py --delete 4
+  python src/main.py --model o3
         """
     )
     
@@ -50,6 +62,42 @@ Examples:
         help="Directory to save exported files (default: exports)"
     )
     
+    # Session management arguments
+    parser.add_argument(
+        "--new-session",
+        action="store_true",
+        help="Start a new research session"
+    )
+    
+    parser.add_argument(
+        "--session-topic",
+        help="Topic for new session (required with --new-session)"
+    )
+    
+    parser.add_argument(
+        "--history",
+        action="store_true",
+        help="List recent research sessions"
+    )
+    
+    parser.add_argument(
+        "--load",
+        type=int,
+        help="Load a specific session by ID"
+    )
+    
+    parser.add_argument(
+        "--delete",
+        type=int,
+        help="Delete a specific session by ID"
+    )
+    
+    parser.add_argument(
+        "--model",
+        default="gpt-4o",
+        help="LLM model to use"
+    )
+    
     return parser.parse_args()
 
 
@@ -59,12 +107,30 @@ def print_status(args) -> None:
     
     if args.verbose:
         print("✓ Verbose mode enabled")
+        
     if args.tools:
         print("✓ Tools display enabled")
+        
     if args.export:
         print(f"✓ Export mode: {args.export}")
         print(f"✓ Output directory: {args.output_dir}")
-    if not args.verbose and not args.tools and not args.export:
+        
+    if args.new_session:
+        print(f"✓ New session: {args.session_topic}")
+        
+    if args.history:
+        print("✓ Session history mode")
+        
+    if args.load:
+        print(f"✓ Load session: {args.load}")
+        
+    if args.delete:
+        print(f"✓ Delete session: {args.delete}")
+        
+    if args.model:
+        print(f"✓ Model: {args.model}")
+        
+    if not any([args.verbose, args.tools]):
         print("✓ Clean output mode (results and sources only)")
         
     print()
@@ -102,7 +168,43 @@ def main() -> None:
     print_status(args)
     
     load_dotenv()
-    agent = ResearchAgent(verbose=args.verbose)
+    
+    # Intialize session manager
+    session_manager = SessionManager()
+    
+    # Handle session management commands
+    if args.new_session:
+        if not args.session_topic:
+            # TODO: Auto-generate a topic based on query instead of requiring user to provide one
+            print("Error: --session-topic is required with --new-session")
+            return
+        if not handle_new_session(session_manager, args.session_topic, args.model):
+            return
+        
+    if args.history:
+        handle_list_sessions(session_manager)
+        return
+    
+    if args.delete:
+        handle_delete_session(session_manager, args.delete)
+        return
+    
+    if args.load:
+        if not handle_load_session(session_manager, args.load):
+            return
+    
+    # Initialize research agent
+    agent = ResearchAgent(model=args.model, verbose=args.verbose, session_manager=session_manager)
+    
+    # If no session is active, create one
+    if not session_manager.is_session_active():
+        topic = input("Enter research topic: ").strip()
+        if topic:
+            session_manager.create_new_session(topic, args.model)
+            print(f"✓ Created new session: {topic}")
+        else:
+            print("No topic provided.")
+            return
     
     try:
         result = agent.research_interactive()
