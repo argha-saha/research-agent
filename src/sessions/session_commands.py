@@ -110,3 +110,46 @@ def handle_load_session(session_manager: SessionManager, session_id: int) -> boo
     else:
         print(f"\n✗ Session {session_id} not found.")
         return False
+
+
+def handle_delete_session(session_manager: SessionManager, session_id: int) -> bool:
+    """Handle the --delete command"""
+    session_data = session_manager.db.get_session(session_id)
+    if not session_data:
+        print(f"\n✗ Session {session_id} not found.")
+        return False
+
+    print(f"\nSession to delete:")
+    print(f"  ID: {session_data['id']}")
+    print(f"  Topic: {session_data['topic']}")
+    print(f"  Created: {session_data['created_at']}")
+    print(f"  Model: {session_data['model_used']}")
+
+    if confirm_action("Are you sure you want to delete this session?"):
+        if session_manager.delete_session(session_id):
+            print(f"\n✓ Session {session_id} deleted successfully.")
+            return True
+        else:
+            print(f"\n✗ Failed to delete session {session_id}.")
+            return False
+    else:
+        print("\nDeletion cancelled.")
+        return False
+
+
+def handle_new_session(session_manager: SessionManager, topic: str, model: str) -> bool:
+    """Handle the --new-session command"""
+    if session_manager.is_session_active():
+        current = session_manager.get_current_session()
+        print(f"\nCurrent session active: {current['topic']} (ID: {current['id']})")
+
+        if not confirm_action(
+            "Do you want to close the current session and start a new one?"
+        ):
+            return False
+
+    session_id = session_manager.create_new_session(topic, model)
+    print(f"\n✓ Created new session {session_id}: {topic}")
+    print(f"  Model: {model}")
+
+    return True
